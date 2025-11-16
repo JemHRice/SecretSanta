@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from get_integer import get_integer_input
+from get_integer import get_integer_input, get_integer_in_range
 import pytest
 
 
@@ -44,3 +44,29 @@ def test_keyboard_interrupt():
     with patch("builtins.input", side_effect=KeyboardInterrupt):
         with pytest.raises(KeyboardInterrupt):
             get_integer_input("Enter a number: ")
+
+
+# With the get_integer_input working, let's test the range component
+
+
+def test_get_integer_in_range_correct():
+    """Test it allows value in range"""
+    with patch("builtins.input", return_value="8"):
+        result = get_integer_in_range("Enter number between 1-10", 1, 10)
+        assert result == 8
+
+
+def test_invalid_then_valid_input_larger_to_correct():
+    """Test that function retries after larger invalid input"""
+    # Simulate user entering invalid input first, then valid
+    with patch("builtins.input", side_effect=["20", "10"]):
+        result = get_integer_in_range("Enter number between 1-10", 1, 10)
+        assert result == 10
+
+
+def test_invalid_then_valid_input_smaller_to_correct():
+    """Test that function retries after invalid input"""
+    # Simulate user entering invalid input first, then valid
+    with patch("builtins.input", side_effect=["0", "10"]):
+        result = get_integer_in_range("Enter number between 1-10", 1, 10)
+        assert result == 10
