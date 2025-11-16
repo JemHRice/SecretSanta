@@ -1,0 +1,72 @@
+from unittest.mock import patch
+from tests.get_integer import get_integer_input, get_integer_in_range
+import pytest
+
+
+def test_valid_integer_input():
+    """Test that valid integer input is accepted"""
+    with patch("builtins.input", return_value="42"):
+        result = get_integer_input("Enter a number: ")
+        assert result == 42
+
+
+def test_negative_integer_input():
+    """Test that negative integers are accepted"""
+    with patch("builtins.input", return_value="-10"):
+        result = get_integer_input("Enter a number: ")
+        assert result == -10
+
+
+def test_invalid_then_valid_input():
+    """Test that function retries after invalid input"""
+    # Simulate user entering invalid input first, then valid
+    with patch("builtins.input", side_effect=["abc", "25"]):
+        result = get_integer_input("Enter a number: ")
+        assert result == 25
+
+
+def test_multiple_invalid_then_valid():
+    """Test multiple invalid attempts before valid input"""
+    with patch("builtins.input", side_effect=["hello", "3.14", "xyz", "100"]):
+        result = get_integer_input("Enter a number: ")
+        assert result == 100
+
+
+def test_empty_string_then_valid():
+    """Test empty string followed by valid input"""
+    with patch("builtins.input", side_effect=["", "15"]):
+        result = get_integer_input("Enter a number: ")
+        assert result == 15
+
+
+def test_keyboard_interrupt():
+    """Test that KeyboardInterrupt is properly raised"""
+    with patch("builtins.input", side_effect=KeyboardInterrupt):
+        with pytest.raises(KeyboardInterrupt):
+            get_integer_input("Enter a number: ")
+
+
+# With the get_integer_input working, let's test the range component
+
+
+def test_get_integer_in_range_correct():
+    """Test it allows value in range"""
+    with patch("builtins.input", return_value="8"):
+        result = get_integer_in_range("Enter number between 1-10", 1, 10)
+        assert result == 8
+
+
+def test_invalid_then_valid_input_larger_to_correct():
+    """Test that function retries after larger invalid input"""
+    # Simulate user entering invalid input first, then valid
+    with patch("builtins.input", side_effect=["20", "10"]):
+        result = get_integer_in_range("Enter number between 1-10", 1, 10)
+        assert result == 10
+
+
+def test_invalid_then_valid_input_smaller_to_correct():
+    """Test that function retries after invalid input"""
+    # Simulate user entering invalid input first, then valid
+    with patch("builtins.input", side_effect=["0", "10"]):
+        result = get_integer_in_range("Enter number between 1-10", 1, 10)
+        assert result == 10
