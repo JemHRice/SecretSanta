@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from tests.get_integer import get_integer_input, get_integer_in_range
+from get_integer import get_integer_input, get_integer_in_range
 import pytest
 
 
